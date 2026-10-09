@@ -1,0 +1,14 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<section class="auth-form">
+    <h1>Create Account</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {{ form.as_p }}
+        <button class="auth-submit" type="submit">Register</button>
+    </form>
+    <p>Already registered? <a href="{% url 'users:login' %}?next={{ next|urlencode }}">Log in</a>.</p>
+</section>
+{% endblock %}

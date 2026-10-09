@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Medify - Online Pharmacy{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=8">
+    {% block extra_head %}{% endblock %}
+</head>
+<body data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}" data-user-name="{{ user.username }}">
+
+    <header>
+        <a href="/" class="logo">Medify</a>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for medicines or describe your symptoms...">
+            <button id="voiceBtn" class="voice-btn" onclick="startVoiceSearch()" title="Voice Search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+            <button class="search-btn" onclick="searchMedicines()">Search</button>
+        </div>
+
+        <div class="user-actions">
+            {% if user.is_authenticated %}
+                <span>{{ user.username }}</span>
+                <form method="post" action="{% url 'users:logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Log Out</button>
+                </form>
+            {% else %}
+                <a href="{% url 'users:login' %}">Login / Register</a>
+            {% endif %}
+            <button class="cart-btn" type="button" onclick="openCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
+        </div>
+    </header>
+
+    <nav class="categories-nav">
+        <a href="#">Pain Relief</a>
+        <a href="#">Cold & Flu</a>
+        <a href="#">Diabetes Care</a>
+        <a href="#">Heart Health</a>
+        <a href="#">First Aid</a>
+    </nav>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <div class="modal-overlay" id="cartModal" role="dialog" aria-modal="true" aria-labelledby="cartModalTitle">
+        <div class="modal cart-modal">
+            <button class="auth-modal-close" type="button" onclick="closeCart()" aria-label="Close cart">&times;</button>
+            <h2 id="cartModalTitle">Your Cart</h2>
+            <div id="cartItems" aria-live="polite"><p>Loading cart...</p></div>
+            <div class="cart-summary">
+                <strong>Total: ₹<span id="cartTotal">0.00</span></strong>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" type="button" onclick="closeCart()">Continue Shopping</button>
+                <button class="btn-proceed" id="cartPayBtn" type="button" onclick="checkoutCart()" hidden>Pay for Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Razorpay Fake Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="{% static 'js/main.js' %}?v=6"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
